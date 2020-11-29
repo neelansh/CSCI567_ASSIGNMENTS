@@ -44,15 +44,15 @@ def binary_train(X, y, loss="perceptron", w0=None, b0=None, step_size=0.5, max_i
         # gradient descent with step size "step_size"  #
         # to minimize perceptron loss                  # 
         ################################################
+        label = np.copy(y)
+        label[label == 0] = -1
         
-        for i in range(0, max_iterations):
+        for i in range(max_iterations):
             pred = np.dot(X, w)+b
-            pred[pred >= 0] = 1.0
-            pred[pred < 0] = 0.0
+            z = label*pred
             
-            w+=(step_size/N)*np.dot(y-pred, X)
-            b+=(step_size/N)*np.sum(y-pred)
-
+            w+=(step_size/N)*np.dot(label[z<=0], X[z<=0])
+            b+=(step_size/N)*np.sum(label[z<=0])
 
     elif loss == "logistic":
         ################################################
@@ -70,7 +70,7 @@ def binary_train(X, y, loss="perceptron", w0=None, b0=None, step_size=0.5, max_i
 
     else:
         raise "Undefined loss function."
-    
+
     assert w.shape == (D,)
     return w, b
 
@@ -249,8 +249,3 @@ def multiclass_predict(X, w, b):
     
     assert preds.shape == (N,)
     return preds
-
-
-
-
-        
