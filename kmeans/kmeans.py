@@ -37,7 +37,9 @@ def get_k_means_plus_plus_center_indices(n, n_cluster, x, generator=np.random):
         prob = min_dist / np.sum(min_dist)
         
         x_idx = np.array([i for i in range(0, len(x))])
-        new_center = generator.choice(x_idx, size=1, p=prob)[0]
+        r = generator.rand()
+#         new_center = generator.choice(x_idx, size=1, p=prob)[0]
+        new_center = np.argmax(np.cumsum(prob) > r)
         centers.append(new_center)
     
     
@@ -109,12 +111,13 @@ class KMeans():
                 
             return membership
         
-        def update_centroids(x, membership):
-            centroids = []
+        def update_centroids(x, membership, centroids):
+            centroids_new = []
             for i in range(0, self.n_cluster):
-                centroids.append(np.mean(x[membership == i], axis=0))
-                
-            return np.stack(centroids)
+                centroids_new.append(np.mean(x[membership == i], axis=0))
+            centroids_new = np.stack(centroids_new)
+            centroids_new[np.isnan(centroids_new)] = centroids[np.isnan(centroids_new)]
+            return centroids_new
             
 
         centroids = []
@@ -132,8 +135,7 @@ class KMeans():
             new_J = distortion_objective(centroids, x, membership)
             if abs(current_J - new_J) > self.e:
                 current_J = new_J
-                centroids = update_centroids(x, membership)
-
+                centroids = update_centroids(x, membership, centroids)                
                 i+=1
             else:
                 break
