@@ -71,7 +71,7 @@ def model_training(train_data, tags):
     A_sum[A_sum == 0] = 1.0
     A = A / np.expand_dims(A_sum, axis=1)
     
-    B_sum = np.sum(A, axis=1)
+    B_sum = np.sum(B, axis=1)
     B[B_sum == 0, :] = 0.0
     B_sum[B_sum == 0] = 1.0
     B = B / np.expand_dims(B_sum, axis=1)
